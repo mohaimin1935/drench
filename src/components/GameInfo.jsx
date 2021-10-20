@@ -13,7 +13,7 @@ const GameInfo = ({ game, initializeBoard, setGame }) => {
             <button
               className="mt-4 px-6 py-1.5 inline-block rounded font-semibold bg-indigo-200 hover:bg-indigo-300 duration-300 shadow-lg hover:shadow-md"
               onClick={() => {
-                if (game != "help") initializeBoard();
+                if (game !== "help") initializeBoard();
                 else setGame("playing");
               }}
             >

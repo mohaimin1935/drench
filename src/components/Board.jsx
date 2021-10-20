@@ -52,7 +52,7 @@ const Board = () => {
 
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
-        if (board[i][j] != cornerColor) return false;
+        if (board[i][j] !== cornerColor) return false;
       }
     }
 
@@ -106,8 +106,6 @@ const Board = () => {
     if (isWin()) {
       setGame("win");
     } else if (count === 0) setGame("lost");
-
-    if (isWin()) console.log(board);
   }, [board, count]);
 
   return (
