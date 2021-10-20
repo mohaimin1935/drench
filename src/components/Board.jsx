@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import Buttons from "./Buttons";
+import GameInfo from "./GameInfo";
 
 const GRID_SIZE = 14;
 
 const Board = () => {
   const [board, setBoard] = useState();
   const [count, setCount] = useState(30);
+  const [game, setGame] = useState("playing");
 
   const ARRAY_14x14 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -37,13 +40,24 @@ const Board = () => {
         else if (randomNumber === 5) tempBoard[i][j] = "gray";
       }
     }
+    setGame("playing");
     setBoard(tempBoard);
     setCount(30);
   };
 
-  useEffect(() => {
-    initializeBoard();
-  }, []);
+  const isWin = () => {
+    if (!board) return false;
+    let cornerColor = board[0][0];
+    if (cornerColor === 0) return false;
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        if (board[i][j] != cornerColor) return false;
+      }
+    }
+
+    return true;
+  };
 
   const isValidPos = (pos, cornerColor, visited) => {
     return (
@@ -84,68 +98,58 @@ const Board = () => {
     setBoard(tempBoard);
   };
 
+  useEffect(() => {
+    initializeBoard();
+  }, []);
+
+  useEffect(() => {
+    if (isWin()) {
+      setGame("win");
+    } else if (count === 0) setGame("lost");
+
+    if (isWin()) console.log(board);
+  }, [board, count]);
+
   return (
     <div>
-      <div className="w-20 h-20 rounded-full mx-auto my-4 flex items-center justify-center bg-indigo-600">
+      <div className="w-20 h-20 rounded-full mx-auto my-4 flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 shadow-xl">
         <p className="text-indigo-50 text-4xl font-semibold bg-red">{count}</p>
       </div>
 
-      <div
-        className="bg-indigo-100 px-6 py-1.5 inline-block rounded shadow mb-4 text-lg font-semibold hover:bg-indigo-200 text-indigo-900 border-2 border-indigo-600 duration-300 cursor-pointer"
-        onClick={() => initializeBoard()}
-      >
-        Reset
+      <div className="flex items-center justify-center gap-4 mb-4 text-lg">
+        <button
+          className="px-6 py-1.5 inline-block rounded font-semibold bg-indigo-200 hover:bg-indigo-300 duration-300 shadow-lg hover:shadow-md"
+          onClick={() => initializeBoard()}
+        >
+          Reset
+        </button>
+        <button
+          className="w-6 h-6 rounded-full flex items-center justify-center border-2 border-red-200 text-red-800 font-semibold duration-300 shadow-lg hover:shadow-md text-sm"
+          onClick={() => setGame("help")}
+        >
+          ?
+        </button>
       </div>
 
-      {board?.map((row, index) => (
-        <div className="flex" key={index}>
-          {row.map((box, index) => (
-            <div
-              className={`w-6 h-6 bg-${box}-500 duration-100`}
-              key={index}
-            ></div>
-          ))}
-        </div>
-      ))}
-
-      <div className="flex items-center justify-center gap-4 mt-4">
-        <div
-          className="w-8 h-8 bg-green-500 rounded ring ring-green-200 cursor-pointer"
-          onClick={() => {
-            handleColor("green");
-          }}
+      <div className="relative shadow-lg p-2 border">
+        <GameInfo
+          game={game}
+          initializeBoard={initializeBoard}
+          setGame={setGame}
         />
-        <div
-          className="w-8 h-8 bg-indigo-500 rounded ring ring-indigo-200 cursor-pointer"
-          onClick={() => {
-            handleColor("indigo");
-          }}
-        />
-        <div
-          className="w-8 h-8 bg-red-500 rounded ring ring-red-200 cursor-pointer "
-          onClick={() => {
-            handleColor("red");
-          }}
-        />
-        <div
-          className="w-8 h-8 bg-yellow-500 rounded ring ring-yellow-200 cursor-pointer"
-          onClick={() => {
-            handleColor("yellow");
-          }}
-        />
-        <div
-          className="w-8 h-8 bg-pink-500 rounded ring ring-pink-200 cursor-pointer"
-          onClick={() => {
-            handleColor("pink");
-          }}
-        />
-        <div
-          className="w-8 h-8 bg-gray-500 rounded ring ring-gray-200 cursor-pointer"
-          onClick={() => {
-            handleColor("gray");
-          }}
-        />
+        {board?.map((row, index) => (
+          <div className="flex" key={index}>
+            {row.map((box, index) => (
+              <div
+                className={`w-6 h-6 bg-${box}-500 duration-100`}
+                key={index}
+              ></div>
+            ))}
+          </div>
+        ))}
       </div>
+
+      <Buttons handleColor={handleColor} />
     </div>
   );
 };
